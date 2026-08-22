@@ -24,9 +24,8 @@ const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
         folder: 'gov-documents',
-        resource_type: 'auto',
-        format: async (req, file) => 'pdf',
-        public_id: (req, file) => 'doc-' + Date.now()
+        resource_type: 'raw',
+        public_id: (req, file) => 'doc-' + Date.now() + '.pdf' //
     },
 });
 
