@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสารบรรณและรับ-ส่งเอกสารราชการ</title>
+    <!-- Google Fonts: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-purple: #6f42c1;
+            --dark-purple: #4a148c;
+            --light-purple: #f3e8ff;
+            --accent-purple: #9c27b0;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .navbar-gov {
+            background: linear-gradient(135deg, var(--dark-purple), var(--primary-purple));
+            box-shadow: 0 4px 12px rgba(111, 66, 193, 0.2);
+        }
+
+        .card-gov {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .btn-purple {
+            background-color: var(--primary-purple);
+            color: white;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 5px rgba(111, 66, 193, 0.3);
+        }
+
+        .btn-purple:hover {
+            background-color: var(--dark-purple);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(111, 66, 193, 0.4);
+        }
+
+        .btn-purple:active {
+            transform: translateY(1px);
+        }
+
+        .table-gov th {
+            background-color: var(--light-purple) !important;
+            color: var(--dark-purple);
+            font-weight: 600;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(111, 66, 193, 0.03);
+        }
+
+        .badge-dept {
+            background-color: var(--light-purple);
+            color: var(--dark-purple);
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <nav class="navbar navbar-dark navbar-gov py-3">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 fs-4">
+                <i class="fa-solid fa-building-columns me-2"></i> ระบบรับ-ส่งและสารบรรณอิเล็กทรอนิกส์
+            </span>
+            <span class="text-white-50 small"><i class="fa-solid fa-shield-halved me-1"></i> งานธุรการกลาง</span>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        
+        <!-- ฟอร์มลงรับเอกสาร -->
+        <div class="card card-gov p-4 mb-5">
+            <h4 class="mb-4 fw-bold" style="color: var(--dark-purple);">
+                <i class="fa-solid fa-file-circle-plus me-2"></i> ลงรับหนังสือราชการใหม่
+            </h4>
+            <form id="docForm">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">เลขที่หนังสือ</label>
+                        <input type="text" class="form-control" id="docNumber" placeholder="เช่น ศธ 05xx/..." required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">ชื่อเรื่อง / หัวข้อเอกสาร</label>
+                        <input type="text" class="form-control" id="title" placeholder="ระบุเรื่องเอกสาร..." required>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold">หน่วยงานที่ส่ง / เจ้าของเรื่อง</label>
+                        <input type="text" class="form-control" id="department" placeholder="เช่น กองคลัง, สำนักปลัด" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold">วันที่ลงรับ</label>
+                        <input type="date" class="form-control" id="date" required>
+                    </div>
+                    <div class="col-md-9">
+                        <label class="form-label fw-semibold">แนบไฟล์เอกสาร (PDF เท่านั้น)</label>
+                        <input type="file" class="form-control" id="pdfFile" accept="application/pdf" required>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-purple w-100 py-2">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> บันทึกเข้าระบบ
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ตารางแสดงรายการเอกสาร -->
+        <div class="card card-gov p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-0" style="color: var(--dark-purple);">
+                    <i class="fa-solid fa-folder-open me-2"></i> ทะเบียนรับเอกสารทั้งหมด
+                </h4>
+                <div class="input-group" style="width: 300px;">
+                    <span class="input-group-text bg-white"><i class="fa-solid fa-search text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control border-start-0" placeholder="ค้นหาเอกสาร...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-gov align-middle">
+                    <thead>
+                        <tr>
+                            <th class="text-center" width="8%">ลำดับ</th>
+                            <th width="15%">เลขที่หนังสือ</th>
+                            <th width="30%">ชื่อเรื่อง</th>
+                            <th width="17%">หน่วยงาน</th>
+                            <th width="12%">วันที่ลงรับ</th>
+                            <th class="text-center" width="18%">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="docTableBody">
+                        <!-- ข้อมูลจะถูกโหลดผ่าน JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+        <!-- Modal สำหรับแก้ไขข้อมูลเอกสาร -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content card-gov border-0">
+                <div class="modal-header text-white" style="background-color: var(--dark-purple);">
+                    <h5 class="modal-title"><i class="fa-solid fa-pen-to-square me-2"></i> แก้ไขข้อมูลหนังสือราชการ</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <form id="editForm">
+                        <input type="hidden" id="editId">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">เลขที่หนังสือ</label>
+                                <input type="text" class="form-control" id="editDocNumber" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">วันที่ลงรับ</label>
+                                <input type="date" class="form-control" id="editDate" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">ชื่อเรื่อง / หัวข้อเอกสาร</label>
+                                <input type="text" class="form-control" id="editTitle" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">หน่วยงานที่ส่ง / เจ้าของเรื่อง</label>
+                                <input type="text" class="form-control" id="editDepartment" required>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">เปลี่ยนไฟล์ PDF ใหม่ (ถ้าต้องการเปลี่ยน)</label>
+                                <input type="file" class="form-control" id="editPdfFile" accept="application/pdf">
+                                <small class="text-muted">หากไม่เลือก ระบบจะใช้ไฟล์ PDF เดิม</small>
+                            </div>
+                        </div>
+                        <div class="text-end mt-4">
+                            <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">ยกเลิก</button>
+                            <button type="submit" class="btn btn-purple px-4 ms-2"><i class="fa-solid fa-floppy-disk me-2"></i> บันทึกการแก้ไข</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script จัดการการทำงานหน้าเว็บ -->
+    <script>
+        document.getElementById('date').valueAsDate = new Date();
+
+        let allDocuments = [];
+        const isLocalDevelopment = window.location.protocol === 'file:' ||
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1';
+        const apiBaseUrl = isLocalDevelopment ? 'http://localhost:3000' : '';
+
+        async function fetchDocuments() {
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/documents`);
+                allDocuments = await response.json();
+                renderTable(allDocuments);
+            } catch (error) {
+                console.error('Error fetching documents:', error);
+            }
+        }
+
+        function renderTable(docs) {
+            const tbody = document.getElementById('docTableBody');
+            tbody.innerHTML = '';
+
+            if (docs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-4 text-muted">ยังไม่มีข้อมูลเอกสารในระบบ</td></tr>`;
+                return;
+            }
+
+            docs.forEach((doc, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="text-center fw-semibold">${index + 1}</td>
+                    <td><span class="fw-bold text-dark">${doc.docNumber}</span></td>
+                    <td>${doc.title}</td>
+                    <td><span class="badge badge-dept">${doc.department}</span></td>
+                    <td>${doc.date}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group">
+                            <a href="${doc.filePath}" target="_blank" class="btn btn-sm btn-outline-primary" title="เปิด/ดาวน์โหลด PDF">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </a>
+                            <button onclick="editDoc('${doc.id}')" class="btn btn-sm btn-outline-warning" title="แก้ไข">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="deleteDoc('${doc.id}')" class="btn btn-sm btn-outline-danger" title="ลบ">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        document.getElementById('docForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('docNumber', document.getElementById('docNumber').value);
+            formData.append('title', document.getElementById('title').value);
+            formData.append('department', document.getElementById('department').value);
+            formData.append('date', document.getElementById('date').value);
+            formData.append('file', document.getElementById('pdfFile').files[0]);
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/api/documents`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || `HTTP ${response.status}`);
+                }
+
+                alert('บันทึกเอกสารสำเร็จ!');
+                document.getElementById('docForm').reset();
+                document.getElementById('date').valueAsDate = new Date();
+                fetchDocuments();
+            } catch (error) {
+                console.error('Error saving document:', error);
+                alert('บันทึกไม่สำเร็จ: ' + error.message);
+            }
+        });
+
+        async function deleteDoc(id) {
+            if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบเอกสารนี้? ไฟล์ PDF จะถูกลบออกจากเครื่องด้วย')) {
+                const response = await fetch(`${apiBaseUrl}/api/documents/${id}`, { method: 'DELETE' });
+                const result = await response.json();
+                if (result.success) {
+                    fetchDocuments();
+                } else {
+                    alert('ไม่สามารถลบข้อมูลได้');
+                }
+            }
+        }
+
+        function editDoc(id) {
+            const doc = allDocuments.find(d => d.id === id);
+            if (!doc) return;
+
+            document.getElementById('editId').value = doc.id;
+            document.getElementById('editDocNumber').value = doc.docNumber;
+            document.getElementById('editTitle').value = doc.title;
+            document.getElementById('editDepartment').value = doc.department;
+            document.getElementById('editDate').value = doc.date;
+            document.getElementById('editPdfFile').value = '';
+
+            const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+            editModal.show();
+        }
+
+        document.getElementById('editForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+
+            const formData = new FormData();
+            formData.append('docNumber', document.getElementById('editDocNumber').value);
+            formData.append('title', document.getElementById('editTitle').value);
+            formData.append('department', document.getElementById('editDepartment').value);
+            formData.append('date', document.getElementById('editDate').value);
+            
+            const fileInput = document.getElementById('editPdfFile');
+            if (fileInput.files.length > 0) {
+                formData.append('file', fileInput.files[0]);
+            }
+
+            const response = await fetch(`${apiBaseUrl}/api/documents/${id}`, {
+                method: 'PUT',
+                body: formData
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('แก้ไขข้อมูลสำเร็จ!');
+                const modalEl = document.getElementById('editModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal.hide();
+                fetchDocuments();
+            } else {
+                alert('เกิดข้อผิดพลาด: ' + result.message);
+            }
+        });
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.toLowerCase();
+            const filtered = allDocuments.filter(doc => 
+                doc.docNumber.toLowerCase().includes(keyword) ||
+                doc.title.toLowerCase().includes(keyword) ||
+                doc.department.toLowerCase().includes(keyword)
+            );
+            renderTable(filtered);
+        });
+
+        fetchDocuments();
+    </script>
+</body>
+</html>
